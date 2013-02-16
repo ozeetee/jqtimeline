@@ -10,7 +10,7 @@ h1{
 }
 
 .hl{
-	color: blue;
+	color: red;
 }
 
 .container{
@@ -45,3 +45,15 @@ h1{
 	border: 1px solid black;
 	border-collapse: collapse;
 }	
+
+.timeline-content{
+	text-align: center;
+}
+.timeline-content h3{
+	/*text-align: center;*/
+}
+.timeline-content img{
+	height: 200px;
+	margin-left: auto;
+	margin-right: auto;
+}

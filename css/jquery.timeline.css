@@ -31,10 +31,13 @@
 		top: 44px;
 	}
 
+	.gt-timeline div.selected{
+		/*border: 2px dashed #999999;*/
+	}
 	.gt-timeline div.e-message{
 		background-color: #666666;
 		position: absolute;
-		top: 80px;
+		top: 70px;
 		color: white;
 	}
 
@@ -42,6 +45,24 @@
 			padding: 5px;
 			font-size: 10px;
 			text-shadow: 0 0 0;
+			cursor: pointer;
+			z-index: 100;
+			position: relative;
+		}
+			.gt-timeline div.e-message .msg:hover{
+				background-color:blue;
+			}
+
+		.gt-timeline div.e-message .info{
+			padding: 5px;
+			font-size: 11px;
+			text-shadow: 0 0 0;
+			cursor: auto;
+			z-index: 100;
+			position: relative;
+			font-weight: bold;
+			border-bottom: 1px dashed #999999;
+			position: default;
 		}
 
 		.gt-timeline div.e-message .message-pointer{
@@ -50,8 +71,18 @@
 			height: 18px;
 			position: absolute;
 			top: -11px;
+			z-index: 1;
 		}
-
+		.gt-timeline .icon-close{
+			background: url(../img/main_img.png) no-repeat -3px -227px;
+			background-color: #999999;
+			width: 14px;
+			height: 14px;
+			position: absolute;
+			top: 5px;
+			right: 7px;
+			cursor: pointer;
+		}
 	.gt-timeline div.event:hover{
 		background-position: -27px -84px;
 	}

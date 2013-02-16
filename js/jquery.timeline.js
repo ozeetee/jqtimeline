@@ -6,8 +6,9 @@
 			numYears : 3,
 			gap : 25, // gap between lines
 			showToolTip : true,
-			groupEventWithinPx : 10, // Will show common tooltip for events within this range of px
-			events : []
+			groupEventWithinPx : 6, // Will show common tooltip for events within this range of px
+			events : [],
+			click : null //Handler for click event for event
 		},
 	aMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -29,7 +30,27 @@
 	}
 
 	jqTimeLine.prototype.init = function() {
+		_this = this;
 		this._generateMarkup();
+		//Attach a event handler to global container
+		if(_this.options.click){
+			_this.$mainContainer.on('click',function(e){
+				var $t = $(e.target);
+				if($t.hasClass('event') || $t.hasClass('msg')){
+					//In both the cases eventId is stored in the format msg_eventid or event_eventid
+					var eventId = $t.attr('id').split("_")[1];
+					_this.options.click(e,_this._aEvents[eventId]);
+				}
+				if($t.hasClass('closeTooltip')){
+					//we may need to close the tooltip
+					var eventId = $t.attr('id').split("_")[1];
+					var $tgt = $('#'+eventId);
+					_this._addEventListner($tgt,'mouseleave');
+					var $tooltipEl = $('#tooltip_' + eventId);
+					$tooltipEl.remove();
+				}
+			});
+		}
 	};
 
 	jqTimeLine.prototype._generateMarkup = function() {
@@ -84,6 +105,29 @@
 		return _this._counter;
 	}
 
+	jqTimeLine.prototype._showToolTip=function(nLeft,strToolTip,eventId,closable){
+		var _this = this;
+		_this._$toolTip  = $(
+								'<div class="e-message" id="tooltip_'+eventId+'" style="left:'+ nLeft +'px">' +
+									'<div class="message-pointer"></div>' +
+									strToolTip + 
+								'</div>'
+							);
+		_this.$mainContainer.append(_this._$toolTip);
+	}
+
+	jqTimeLine.prototype._getAllNeighborEvents = function(nLeft){
+		var _this = this;
+		//Get all event within 10 px range. Group all event within 
+		var neighborEvents = $('.event',_this.$mainContainer).filter(function(){
+			var nCurrentElLeftVal = parseInt($(this).css('left'));
+			return (nCurrentElLeftVal <= nLeft +  _this.options.groupEventWithinPx) && (nCurrentElLeftVal >= nLeft -  _this.options.groupEventWithinPx);
+		});
+		return neighborEvents;
+	}
+
+
+
 	jqTimeLine.prototype._getEventMarkup = function(e){
 		var _this = this;
 		//Attach id if not there
@@ -95,45 +139,92 @@
 		var yn = d.getFullYear() - _this.options.startYear;
 		var mn = d.getMonth();
 		var totalMonths = (yn * 12) + mn;
-		var leftVal = _this._offset_x + totalMonths * _this.options.gap + (_this.options.gap/31)*n - _this._eDotWidth/2;
-		var $retHtml = $('<div class="event" style="left:'+leftVal+'px">&nbsp;</div>').data('event',e);
+		var leftVal = Math.ceil(_this._offset_x + totalMonths * _this.options.gap + (_this.options.gap/31)*n - _this._eDotWidth/2);
+		var $retHtml = $('<div class="event" id="event_'+e.id+'" style="left:'+leftVal+'px">&nbsp;</div>').data('event',e);
+		$retHtml.data('eventInfo',_this._aEvents[e.id]);
+		if(_this.options.click){
+			_this._addEventListner($retHtml,'click');
+		}
 		if(_this.options.showToolTip){
-			$retHtml.hover( 
-				function(e){
-					var $t = $(e.target);
-					var nLeft = parseInt($t.css('left'));
-					var eObj = $t.data('event');
-					if(_this._$toolTip) _this._$toolTip.remove();
-
-					//Get all event within 10 px range. Group all event within 
-					var neighborEvents = $('.event',_this.$mainContainer).filter(function(){
-						var nCurrentElLeftVal = parseInt($(this).css('left'));
-						return (nCurrentElLeftVal <= nLeft +  _this.options.groupEventWithinPx) && (nCurrentElLeftVal >= nLeft -  _this.options.groupEventWithinPx);
-					});
-
-					var strToolTip = "" ;
-					for (var i = 0; i < neighborEvents.length; i++) {
-						var $temp = $(neighborEvents[i]);
-						var oData = $temp.data('event');
-						strToolTip = strToolTip + '<div class="msg">'+oData.on.toDateString()+' : '+ oData.name +'</div>';
-					};
-										
-					_this._$toolTip  = $(
-											'<div class="e-message" style="left:'+ nLeft +'px">' +
-												'<div class="message-pointer"></div>' +
-												strToolTip + 
-											'</div>'
-										);
-					_this.$mainContainer.append(_this._$toolTip);
-				}, function(e){
-					if(_this._$toolTip) _this._$toolTip.remove();
-					_this._$toolTip = null;
-				}
-			);
+			_this._addEventListner($retHtml,'mouseover');
+			_this._addEventListner($retHtml,'mouseleave');
 		}
 		_this._a$Events[e.id] = $retHtml;
 		return $retHtml;
 	}
+
+	jqTimeLine.prototype._addEventListner = function($retHtml,sEvent){
+		var _this = this;
+		if(sEvent == 'mouseover'){
+			$retHtml.mouseover( 
+				function(e){
+					var $t = $(e.target);
+					var nLeft = parseInt($t.css('left'));
+					var eObj = $t.data('event');
+					if(_this._$toolTip){
+						if(_this._$toolTip.data('state') && _this._$toolTip.data('state') === 'static'){
+							var eventId = _this._$toolTip.data('eventId');
+							var $tgt = $('#'+eventId);
+							// _this._addEventListner($tgt,'mouseover');
+							_this._addEventListner($tgt,'mouseleave');
+							_this._$toolTip.data('state','dynamic');
+						}
+						_this._$toolTip.remove();
+					} 
+
+					var neighborEvents = _this._getAllNeighborEvents(nLeft);
+					var strToolTip = "" ;
+					for (var i = 0; i < neighborEvents.length; i++) {
+						var $temp = $(neighborEvents[i]);
+						var oData = $temp.data('event');
+						strToolTip = strToolTip + '<div class="msg" id="msg_'+oData.id+'">'+oData.on.toDateString()+' : '+ oData.name +'</div>';
+					};
+					_this._showToolTip(nLeft,strToolTip,eObj.id,false);
+				}
+			);
+		}
+		if(sEvent == 'mouseleave'){
+			$retHtml.mouseleave(function(e){
+				var $targetObj = $(this);
+				var eventId = $targetObj.data('event').id;
+				var $tooltipEl = $('#tooltip_' + eventId);
+				e.stopImmediatePropagation();
+				var fixed = setTimeout(function(){
+					$tooltipEl.remove();
+				}, 500);
+				$tooltipEl.hover(
+					function(){clearTimeout (fixed);},
+				    function(){$tooltipEl.remove();}
+				);
+			});
+		}
+		if(sEvent == 'click'){
+		// Attach a click event handler to event objects
+			$retHtml.click(function(e){
+				var $targetObj = $(this);
+				var eventId = $targetObj.data('event').id;
+				var $tooltipEl = $('#tooltip_' + eventId);
+				var $msgs = $('.msg',$tooltipEl);
+				if($msgs.length == 1){
+					// Do not stop the propogation .. let the parent handles the click event
+					//_this.options.click();
+				}else if($msgs.length > 1){
+					// If the tooltip has more than one message make it non-dynamic
+					e.stopPropagation(); // Stop the propogation so that the parent wont get notified
+					var markup =	$('<div class="info">' + 
+										'<div>Select one even from below : </div>' + 
+										'<div class="icon-close closeTooltip" id="eCloseButton_'+eventId+'"></div>' + 
+									'</div>');
+					$tooltipEl.prepend(markup);
+					// $retHtml.off('mouseover');
+					$retHtml.off('mouseleave');
+					$tooltipEl.data('state','static');
+					$tooltipEl.data('eventId',eventId);
+				}
+			});
+		}	
+	}
+
 
 	var isArray = function(a){
 		return Object.prototype.toString.apply(a) === '[object Array]';
