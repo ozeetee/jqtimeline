@@ -1,3 +1,11 @@
+/*!
+ * jqtimeline Plugin
+ * http://goto.io/jqtimeline
+ *
+ * Copyright 2013 goto.io
+ * Released under the MIT license
+ *
+ */
 ;
 (function($) {
 	var pluginName = 'jqTimeline',
