@@ -1,0 +1,27 @@
+{
+	"name": "jqtimeline",
+	"version": "1.0.0",
+	"title": "jQuery TimeLine plugin",
+	"description": "Simple and elegent jQuery timeline plugin to show important date events on a timeline.",
+	"author": {
+		"name": "Gaurav Tiwari",
+		"email": "gt@goto.io",
+		"url": "http://goto.io"
+	},
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "MIT-LICENSE.txt"
+		}
+	],
+	"dependencies": {
+		"jquery": ">=1.7"
+	},
+	"keywords": [ "timeline", "time", "ui","date"],
+	"homepage": "http://goto.io/jqtimeline",
+	"bugs": {
+		"url": "https://github.com/ozeetee/jqtimeline/issues"
+	},
+	"docs": "http://goto.io/jqtimeline/docs.html",
+	"download": "https://github.com/ozeetee/jqtimeline"
+}
