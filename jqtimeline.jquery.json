@@ -1,6 +1,6 @@
 {
 	"name": "jqtimeline",
-	"version": "1.0.0",
+	"version": "0.1.0",
 	"title": "jQuery TimeLine plugin",
 	"description": "Simple and elegent jQuery timeline plugin to show important date events on a timeline.",
 	"author": {
