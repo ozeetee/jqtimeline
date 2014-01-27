@@ -16,9 +16,9 @@
 			showToolTip : true,
 			groupEventWithinPx : 6, // Will show common tooltip for events within this range of px
 			events : [],
-			click : null //Handler for click event for event
-		},
-	aMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+			click : null, //Handler for click event for event
+			monthNames : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+		};
 
 	function jqTimeLine(element, options) {
 		this.options = $.extend({}, defaults, options);
@@ -94,12 +94,12 @@
 		if(num== 0){
 			retStr='<div class="horizontal-line leftend" style="left:'+_this._current_offset_x+'px">' + 
 						'<div class="year">'+year+'</div>' + 
-						'<div class="month">Jan</div>' + 
+						'<div class="month">'+_this.options.monthNames[0]+'</div>' + 
 					'</div>';
 		}else if(num%2 == 1){
 			retStr = '<div class="horizontal-line month-line odd-month" style="left:'+_this._current_offset_x+'px"></div>';
 		}else{
-			retStr = '<div class="horizontal-line month-line even-month" style="left:'+_this._current_offset_x+'px"><div class="month">'+aMonths[num]+'</div></div>';
+			retStr = '<div class="horizontal-line month-line even-month" style="left:'+_this._current_offset_x+'px"><div class="month">'+_this.options.monthNames[num]+'</div></div>';
 		}
 		_this._current_offset_x += _this._gap;
 		return retStr;
