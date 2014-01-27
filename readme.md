@@ -42,12 +42,16 @@ int : If the events are very close to each other on the timeline its hard for a 
 *default: 6*
 
 - **events**
-Arrar[] : Array of events to be shown on the timeline. Dont confuse this with javascript/jquery event object. The format of event object is given in next section.
+Array[] : Array of events to be shown on the timeline. Dont confuse this with javascript/jquery event object. The format of event object is given in next section.
 *default: null*
 
 - **click**
 function : The function to be called when a user clicked on a specific event. This function is passed with jQuery Event object and the Timeline event object.
 *default: null*
+
+- **monthNames**
+Array[]: Array of month names.
+*default: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']*
 
 Example : 
 ```javascript
